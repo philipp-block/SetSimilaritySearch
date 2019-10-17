@@ -24,6 +24,13 @@ def _containment_min_overlap_threshold_func(x, t):
 def _containment_min_overlap_index_threshold_func(x, t):
     return int(x * t)
 
+def _containment_max_overlap_threshold_func(x, t):
+    return int(x * t)
+
+_containment_max_overlap_index_threshold_func = (
+    _containment_max_overlap_threshold_func
+)
+
 def _jaccard_position_filter(s1, s2, p1, p2, t):
     l1, l2 = len(s1), len(s2)
     return float(min(l1-p1, l2-p2)) / float(max(l1, l2)) >= t
@@ -39,6 +46,10 @@ def _containment_position_filter(s1, s2, p1, p2, t):
 def _containment_min_position_filter(s1, s2, p1, p2, t):
     l1, l2 = len(s1), len(s2)
     return float(min(l1-p1, l2-p2)) / float(max(l1, l2)) >= t
+
+def _containment_max_position_filter(s1, s2, p1, p2, t):
+    l1, l2 = len(s1), len(s2)
+    return float(min(l1-p1, l2-p2)) / float(min(l1, l2)) >= t
 
 def _jaccard(s1, s2):
     i = len(np.intersect1d(s1, s2, assume_unique=True))
@@ -56,11 +67,16 @@ def _containment_min(s1, s2):
     i = len(np.intersect1d(s1, s2, assume_unique=True))
     return (float(i)) / (float(max(len(s1), len(s2))))
 
+def _containment_max(s1, s2):
+    i = len(np.intersect1d(s1, s2, assume_unique=True))
+    return (float(i)) / (float(min(len(s1), len(s2))))
+
 _similarity_funcs = {
     "jaccard": _jaccard,
     "cosine": _cosine,
     "containment": _containment,
     "containment_min": _containment_min,
+    "containment_max": _containment_max,
 }
 
 _overlap_threshold_funcs = {
@@ -68,6 +84,7 @@ _overlap_threshold_funcs = {
     "cosine": _cosine_overlap_threshold_func,
     "containment": _containment_overlap_threshold_func,
     "containment_min": _containment_min_overlap_threshold_func,
+    "containment_max": _containment_max_overlap_threshold_func,
 }
 
 _overlap_index_threshold_funcs = {
@@ -75,7 +92,7 @@ _overlap_index_threshold_funcs = {
     "cosine": _cosine_overlap_index_threshold_func,
     "containment": _containment_overlap_index_threshold_func,
     "containment_min": _containment_min_overlap_index_threshold_func,
-
+    "containment_max": _containment_max_overlap_index_threshold_func,
 }
 
 _position_filter_funcs = {
@@ -83,9 +100,15 @@ _position_filter_funcs = {
     "cosine": _cosine_position_filter,
     "containment": _containment_position_filter,
     "containment_min":  _containment_min_position_filter,
+    "containment_max":  _containment_max_position_filter,
 }
 
-_symmetric_similarity_funcs = ["jaccard", "cosine", "containment_min"]
+_symmetric_similarity_funcs = [
+    "jaccard",
+    "cosine",
+    "containment_min",
+    "containment_max"
+]
 _asymmetric_similarity_funcs = ["containment"]
 
 def _frequency_order_transform(sets):

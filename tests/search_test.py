@@ -28,6 +28,29 @@ class TestSearchIndex(unittest.TestCase):
         correct_results = set([(1, 1.0), (2, 2.0/3.0)])
         self.assertEqual(set(results), correct_results)
 
+    def test_containment_max(self):
+        # Query small in large
+        sets = [[1,2,3], [3,4,5], [2,3,4], [5,6,7]]
+        index = SearchIndex(
+            sets,
+            similarity_func_name="containment_max",
+            similarity_threshold=0.4
+        )
+        results = index.query([1,2])
+        correct_results = {(0, 1.0), (2, 0.5)}
+        self.assertEqual(set(results), correct_results)
+
+        # Query large in small
+        sets = [[1,2], [3,4], [2,3,4,5], [6,7], [1,6,7]]
+        index = SearchIndex(
+            sets,
+            similarity_func_name="containment_max",
+            similarity_threshold=0.4
+        )
+        results = index.query([1,2,3,4])
+        correct_results = {(0, 1.0), (1, 1.0), (2, 0.75)}
+        self.assertEqual(set(results), correct_results)
+
 
 if __name__ == "__main__":
     unittest.main()
